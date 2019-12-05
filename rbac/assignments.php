@@ -6,4 +6,7 @@ return [
     'author' => [
         'author',
     ],
+    'test' => [
+        'admin',
+    ],
 ];

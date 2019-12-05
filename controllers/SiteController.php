@@ -65,6 +65,11 @@ class SiteController extends Controller
         return $this->render('index', ['data' => $data]);
     }
 
+
+public function actionMobile(){
+	 return $this->render('mobile');
+}
+
     /**
      * Login action.
      *

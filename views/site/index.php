@@ -13,7 +13,7 @@ $this->title = 'My Yii Application';
 	<?php
 	foreach($data as $row){
 		echo Html::tag('h1', $row->title);
-		echo Html::tag('small', $row->username . ' ' . $row->date);
+		echo Html::tag('p',Html::tag('small', $row->username . ' ' . $row->date));
 		echo $row->content;
 		echo '<hr/>';	
 	}

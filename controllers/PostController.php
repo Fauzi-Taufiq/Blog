@@ -102,7 +102,7 @@ class PostController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post()) && $id > 2) {
 		$model->date = date('Y-m-d H:i:s');
                 $model->username = \Yii::$app->user->identity->username;
                 if($model->save()){
@@ -124,7 +124,9 @@ class PostController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+	if($id > 2){
+        	$this->findModel($id)->delete();
+	}
 
         return $this->redirect(['index']);
     }
