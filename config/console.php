@@ -9,8 +9,8 @@ $config = [
     'bootstrap' => ['log'],
     'controllerNamespace' => 'app\commands',
     'components' => [
-	'authManager' => [
-            'class' => 'yii\rbac\PhpManager',
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -26,13 +26,18 @@ $config = [
         'db' => $db,
     ],
     'params' => $params,
-    /*
+
     'controllerMap' => [
-        'fixture' => [ // Fixture generation command line.
-            'class' => 'yii\faker\FixtureController',
+        'migrate' => [
+            'class' => 'yii\console\controllers\MigrateController',
+            'migrationPath' => [
+                '@app/migrations',          // migrasi utama 
+                '@yii/rbac/migrations',     // migrasi RBAC
+            ],
         ],
     ],
-    */
+
+
 ];
 
 if (YII_ENV_DEV) {
