@@ -3,6 +3,12 @@ body {
     height: 100%;
 }
 
+body {
+    background: #fff;
+    color: #222;
+    font-family: "Roboto", Arial, sans-serif;
+}
+
 .wrap {
     min-height: 100%;
     height: auto;
@@ -11,105 +17,234 @@ body {
 }
 
 .wrap > .container {
-    padding: 70px 15px 20px;
+    padding: 70px 15px 30px;
+}
+
+.navbar-inverse.site-navbar {
+    min-height: 54px;
+    border: 0;
+    border-bottom: 3px solid #111;
+    border-radius: 0;
+    background: #222;
+}
+
+.navbar-inverse.site-navbar .navbar-brand,
+.navbar-inverse.site-navbar .navbar-nav > li > a {
+    color: #fff;
+}
+
+.navbar-inverse.site-navbar .navbar-brand {
+    font-weight: 500;
+}
+
+.navbar-inverse.site-navbar .navbar-nav > li > a {
+    padding-top: 17px;
+    padding-bottom: 17px;
+}
+
+.navbar-inverse.site-navbar .navbar-nav > li > a:hover,
+.navbar-inverse.site-navbar .navbar-nav > li > a:focus,
+.navbar-inverse.site-navbar .navbar-nav > .active > a,
+.navbar-inverse.site-navbar .navbar-nav > .active > a:hover,
+.navbar-inverse.site-navbar .navbar-nav > .active > a:focus {
+    color: #fff;
+    background: #111;
+}
+
+.navbar-inverse.site-navbar .navbar-toggle {
+    border-color: #777;
+    border-radius: 4px;
+}
+
+.navbar-inverse.site-navbar .navbar-toggle:hover,
+.navbar-inverse.site-navbar .navbar-toggle:focus {
+    background: #111;
+}
+
+.navbar-inverse.site-navbar .navbar-collapse {
+    border-color: #444;
+}
+
+.navbar-inverse.site-navbar .navbar-nav > li > form > button.logout {
+    padding: 17px 15px;
+    color: #fff;
+}
+
+.navbar-inverse.site-navbar .navbar-nav > li > form > button.logout:hover,
+.navbar-inverse.site-navbar .navbar-nav > li > form > button.logout:focus {
+    color: #fff;
+    background: #111;
 }
 
 .footer {
     height: 60px;
-    background-color: #f5f5f5;
-    border-top: 1px solid #ddd;
     padding-top: 20px;
+    border-top: 1px solid #ddd;
+    background: #f7f7f7;
+    color: #666;
+    font-size: 13px;
 }
 
-.jumbotron {
-    text-align: center;
-    background-color: transparent;
+.footer p {
+    margin-bottom: 0;
 }
 
-.jumbotron .btn {
-    font-size: 21px;
-    padding: 14px 24px;
+.site-index,
+.post-index {
+    max-width: 960px;
+    margin: 0 auto;
 }
 
-.not-set {
-    color: #c55;
-    font-style: italic;
+.site-index .body-content > h1 {
+    margin-top: 28px;
+    margin-bottom: 8px;
+    color: #222;
+    font-size: 26px;
+    font-weight: 500;
 }
 
-/* add sorting icons to gridview sort links */
-a.asc:after, a.desc:after {
-    position: relative;
-    top: 1px;
-    display: inline-block;
-    font-family: 'Glyphicons Halflings';
-    font-style: normal;
-    font-weight: normal;
-    line-height: 1;
-    padding-left: 5px;
+.site-index .body-content > p {
+    margin-bottom: 16px;
+    color: #666;
 }
 
-a.asc:after {
-    content: /*"\e113"*/ "\e151";
+.site-index hr {
+    margin: 24px 0;
+    border-color: #ddd;
 }
 
-a.desc:after {
-    content: /*"\e114"*/ "\e152";
+.post-index h1 {
+    margin-bottom: 20px;
+    color: #222;
+    font-size: 28px;
+    font-weight: 500;
 }
 
-.sort-numerical a.asc:after {
-    content: "\e153";
+.grid-view {
+    overflow-x: auto;
 }
 
-.sort-numerical a.desc:after {
-    content: "\e154";
-}
-
-.sort-ordinal a.asc:after {
-    content: "\e155";
-}
-
-.sort-ordinal a.desc:after {
-    content: "\e156";
+.grid-view table {
+    background: #fff;
 }
 
 .grid-view th {
     white-space: nowrap;
 }
 
+.btn {
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+.action-link {
+    min-width: 52px;
+    margin: 2px 3px 2px 0;
+    padding: 5px 9px;
+    font-weight: 500;
+}
+
+.btn-default.action-link {
+    border-color: #555;
+    background: #fff;
+    color: #222;
+}
+
+.btn-default.action-link:hover,
+.btn-default.action-link:focus {
+    border-color: #222;
+    background: #eee;
+    color: #111;
+}
+
+.btn-primary.action-link {
+    border-color: #222;
+    background: #222;
+    color: #fff;
+}
+
+.btn-primary.action-link:hover,
+.btn-primary.action-link:focus {
+    border-color: #000;
+    background: #000;
+    color: #fff;
+}
+
+.form-control {
+    border-radius: 4px;
+    box-shadow: none;
+}
+
+.form-control:focus {
+    border-color: #777;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+.alert {
+    border-radius: 4px;
+}
+
 .hint-block {
     display: block;
     margin-top: 5px;
-    color: #999;
+    color: #777;
 }
 
 .error-summary {
-    color: #a94442;
-    background: #fdf7f7;
-    border-left: 3px solid #eed3d7;
     padding: 10px 20px;
-    margin: 0 0 15px 0;
+    margin: 0 0 15px;
+    border-left: 3px solid #999;
+    background: #f7f7f7;
+    color: #444;
 }
 
-/* align the logout "link" (button in form) of the navbar */
+.not-set {
+    color: #777;
+    font-style: italic;
+}
+
+a.asc:after,
+a.desc:after {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    padding-left: 5px;
+    font-family: "Glyphicons Halflings";
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+}
+
+a.asc:after { content: "\e151"; }
+a.desc:after { content: "\e152"; }
+.sort-numerical a.asc:after { content: "\e153"; }
+.sort-numerical a.desc:after { content: "\e154"; }
+.sort-ordinal a.asc:after { content: "\e155"; }
+.sort-ordinal a.desc:after { content: "\e156"; }
+
 .nav li > form > button.logout {
     padding: 15px;
-    border: none;
+    border: 0;
 }
 
-@media(max-width:767px) {
-    .nav li > form > button.logout {
-        display:block;
-        text-align: left;
-        width: 100%;
-        padding: 10px 15px;
-    }
-}
-
-.nav > li > form > button.logout:focus,
-.nav > li > form > button.logout:hover {
+.nav > li > form > button.logout:hover,
+.nav > li > form > button.logout:focus {
     text-decoration: none;
 }
 
 .nav > li > form > button.logout:focus {
     outline: none;
+}
+
+@media (max-width: 767px) {
+    .wrap > .container {
+        padding-top: 60px;
+    }
+
+    .nav li > form > button.logout {
+        display: block;
+        width: 100%;
+        padding: 10px 15px;
+        text-align: left;
+    }
 }
