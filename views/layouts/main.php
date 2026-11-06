@@ -39,7 +39,10 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Artikel Saya', 'url' => ['/post/index']],
+            [
+                'label' => Yii::$app->user->can('Admin') ? 'Daftar Artikel' : 'Artikel Saya',
+                'url' => ['/post/index'],
+            ],
             [
                 'label' => 'Akun',
                 'url' => ['/account/index'],
