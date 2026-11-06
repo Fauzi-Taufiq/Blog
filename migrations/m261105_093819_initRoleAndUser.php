@@ -41,6 +41,23 @@ class m261105_093819_initRoleAndUser extends Migration
         $auth->add($roleAuthor);
         $auth->addChild($roleAuthor, $permBlogIndex);
         $auth->assign($roleAuthor, 'ATH001');
+
+
+        //init dummy post
+        $this->batchInsert('{{%post}}', ['title', 'content', 'date', 'username'], [
+            [
+                'Selamat Datang di Website Baru Kami',
+                'Ini adalah postingan pertama yang dibuat sebagai contoh atau dummy data untuk blog ini.',
+                date('Y-m-d H:i:s'),
+                'ADM001'
+            ],
+            [
+                'Tips Belajar Framework Yii2 dengan Cepat',
+                'Yii2 adalah framework PHP yang sangat cepat dan aman. Pelajari dasar-dasar MVC dan RBAC untuk hasil optimal.',
+                date('Y-m-d H:i:s'),
+                'ATH001'
+            ],
+        ]);
     }
 
     /**
