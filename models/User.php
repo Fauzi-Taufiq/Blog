@@ -2,16 +2,18 @@
 
 namespace app\models;
 
-class User extends Account implements \yii\web\IdentityInterface
+use Yii;
+use yii\web\IdentityInterface;
+
+class User extends Account implements IdentityInterface
 {
-
-
     /**
      * @inheritdoc
      */
     public static function findIdentity($id)
     {
-        return User::findOne($id);
+        // $id di sini adalah primary key (biasanya id)
+        return static::findOne($id);
     }
 
     /**
@@ -19,7 +21,6 @@ class User extends Account implements \yii\web\IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-
         return null;
     }
 
@@ -31,7 +32,8 @@ class User extends Account implements \yii\web\IdentityInterface
      */
     public static function findByUsername($username)
     {
-        return User::findOne($username);
+        // PERBAIKAN: Cari berdasarkan kolom username, bukan primary key langsung
+        return static::findOne(['username' => $username]);
     }
 
     /**
@@ -39,7 +41,8 @@ class User extends Account implements \yii\web\IdentityInterface
      */
     public function getId()
     {
-        return $this->username;
+        // PERBAIKAN: Kembalikan primary key (biasanya $this->id), bukan username
+        return $this->username; 
     }
 
     /**
@@ -66,6 +69,7 @@ class User extends Account implements \yii\web\IdentityInterface
      */
     public function validatePassword($password)
     {
-        return $this->password === md5($password);
+        // Gunakan security component untuk memverifikasi hash Bcrypt
+        return Yii::$app->security->validatePassword($password, $this->password);
     }
 }
