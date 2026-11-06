@@ -27,7 +27,7 @@ class AccountController extends Controller
                     [
                         'actions' => ['index', 'create', 'update', 'delete', 'view'],
                         'allow' => true,
-                        'roles' => ['admin'],
+                        'roles' => ['Admin'],
                     ],
                 ],
             ],
@@ -76,15 +76,21 @@ class AccountController extends Controller
     public function actionCreate()
     {
         $model = new Account();
+        $model->scenario = Account::SCENARIO_CREATE;
 
         if ($model->load(Yii::$app->request->post())) {
-		$role = \Yii::$app->authManager->getRole(strtolower($model->role));
-           	\Yii::$app->authManager->revokeAll($model->username);
-             	\Yii::$app->authManager->assign($role, $model->username);
-		$model->password = md5($model->password);
-		if($model->save()){
-            		return $this->redirect(['view', 'id' => $model->username]);
-		}
+            $role = Yii::$app->authManager->getRole($model->role);
+            if ($role === null) {
+                $model->addError('role', 'Role yang dipilih tidak tersedia.');
+            } elseif ($model->password === '') {
+                $model->addError('password', 'Password wajib diisi.');
+            } else {
+                $model->password = Yii::$app->security->generatePasswordHash($model->password);
+                if ($model->save()) {
+                    Yii::$app->authManager->assign($role, $model->username);
+                    return $this->redirect(['view', 'id' => $model->username]);
+                }
+            }
         }
 
         return $this->render('create', [
@@ -102,19 +108,27 @@ class AccountController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->scenario = Account::SCENARIO_UPDATE;
+        $currentPassword = $model->password;
 
         if ($model->load(Yii::$app->request->post())) {
-		$role = \Yii::$app->authManager->getRole(strtolower($model->role));
-                \Yii::$app->authManager->revokeAll($model->username);
-                \Yii::$app->authManager->assign($role, $model->username);
-		$model->password = md5($model->password);
+            $role = Yii::$app->authManager->getRole($model->role);
+            if ($role === null) {
+                $model->addError('role', 'Role yang dipilih tidak tersedia.');
+            } else {
+                $model->password = $model->password === ''
+                    ? $currentPassword
+                    : Yii::$app->security->generatePasswordHash($model->password);
 
-                if($model->save()){
-            		return $this->redirect(['view', 'id' => $model->username]);
-		}
+                if ($model->save()) {
+                    Yii::$app->authManager->revokeAll($model->username);
+                    Yii::$app->authManager->assign($role, $model->username);
+                    return $this->redirect(['view', 'id' => $model->username]);
+                }
+            }
+        } else {
+            $model->password = '';
         }
-	
-	$model->password = null;
 
         return $this->render('update', [
             'model' => $model,

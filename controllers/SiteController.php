@@ -61,7 +61,10 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-	$data = \app\models\Post::find()->orderBy('date DESC')->all();
+        $data = \app\models\Post::find()
+            ->where(['status' => \app\models\Post::STATUS_PUBLISHED])
+            ->orderBy('date DESC')
+            ->all();
         return $this->render('index', ['data' => $data]);
     }
 

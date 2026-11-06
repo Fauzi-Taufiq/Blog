@@ -6,6 +6,7 @@ use Yii;
 use app\models\Post;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -25,9 +26,14 @@ class PostController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['index', 'create', 'update', 'delete', 'view'],
+                        'actions' => ['index', 'create', 'update', 'delete', 'view', 'submit'],
                         'allow' => true,
                         'roles' => ['Author', 'Admin'],
+                    ],
+                    [
+                        'actions' => ['approve', 'reject'],
+                        'allow' => true,
+                        'roles' => ['Admin'],
                     ],
                 ],
             ],
@@ -36,6 +42,9 @@ class PostController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'submit' => ['POST'],
+                    'approve' => ['POST'],
+                    'reject' => ['GET', 'POST'],
                 ],
             ],
         ];
@@ -47,8 +56,16 @@ class PostController extends Controller
      */
     public function actionIndex()
     {
+        if ($this->isAdmin()) {
+            $query = Post::find()->where(['status' => Post::STATUS_PENDING]);
+        } else {
+            $query = Post::find()->where([
+                'username' => Yii::$app->user->identity->username,
+            ]);
+        }
+
         $dataProvider = new ActiveDataProvider([
-            'query' => Post::find()->orderby('date DESC'),
+            'query' => $query->orderBy('date DESC'),
         ]);
 
         return $this->render('index', [
@@ -64,8 +81,11 @@ class PostController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $this->checkPostAccess($model);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
@@ -79,11 +99,12 @@ class PostController extends Controller
         $model = new Post();
 
         if ($model->load(Yii::$app->request->post())) {
-		$model->date = date('Y-m-d H:i:s');
-		$model->username = \Yii::$app->user->identity->username;
-		if($model->save()){
-            return $this->redirect(['view', 'id' => $model->idpost]);
-		}
+            $model->date = date('Y-m-d H:i:s');
+            $model->username = Yii::$app->user->identity->username;
+            $model->status = Post::STATUS_DRAFT;
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->idpost]);
+            }
         }
 
         return $this->render('create', [
@@ -101,13 +122,19 @@ class PostController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $this->checkPostAccess($model);
+        if ($model->username !== Yii::$app->user->identity->username
+            || !in_array($model->status, [Post::STATUS_DRAFT, Post::STATUS_REJECTED], true)
+        ) {
+            throw new ForbiddenHttpException('Artikel ini tidak dapat diedit.');
+        }
 
-        if ($model->load(Yii::$app->request->post()) && $id > 2) {
-		$model->date = date('Y-m-d H:i:s');
-                $model->username = \Yii::$app->user->identity->username;
-                if($model->save()){
-            return $this->redirect(['view', 'id' => $model->idpost]);
-		}
+        if ($model->load(Yii::$app->request->post())) {
+            $model->date = date('Y-m-d H:i:s');
+            $model->username = Yii::$app->user->identity->username;
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->idpost]);
+            }
         }
 
         return $this->render('update', [
@@ -124,11 +151,75 @@ class PostController extends Controller
      */
     public function actionDelete($id)
     {
-	if($id > 2){
-        	$this->findModel($id)->delete();
-	}
+        $model = $this->findModel($id);
+        $this->checkPostAccess($model);
+        if (!$this->isAdmin()
+            && ($model->username !== Yii::$app->user->identity->username
+                || !in_array($model->status, [Post::STATUS_DRAFT, Post::STATUS_REJECTED], true))
+        ) {
+            throw new ForbiddenHttpException('Artikel ini tidak dapat dihapus.');
+        }
+        $model->delete();
 
         return $this->redirect(['index']);
+    }
+
+    public function actionSubmit($id)
+    {
+        $model = $this->findModel($id);
+        $this->checkPostAccess($model);
+        if ($model->username !== Yii::$app->user->identity->username) {
+            throw new ForbiddenHttpException('Anda hanya dapat mengajukan artikel milik sendiri.');
+        }
+
+        if ($model->submitForReview()) {
+            Yii::$app->session->setFlash('success', 'Artikel berhasil diajukan untuk review.');
+        } else {
+            Yii::$app->session->setFlash('error', implode(' ', $model->getFirstErrors()));
+        }
+
+        return $this->redirect(['index']);
+    }
+
+    public function actionApprove($id)
+    {
+        $model = $this->findModel($id);
+        if ($model->approve()) {
+            Yii::$app->session->setFlash('success', 'Artikel berhasil dipublikasikan.');
+        } else {
+            Yii::$app->session->setFlash('error', implode(' ', $model->getFirstErrors()));
+        }
+
+        return $this->redirect(['index']);
+    }
+
+    public function actionReject($id)
+    {
+        $model = $this->findModel($id);
+        if ($model->status !== Post::STATUS_PENDING) {
+            throw new ForbiddenHttpException('Hanya artikel pending yang dapat ditolak.');
+        }
+
+        if (Yii::$app->request->isPost) {
+            if ($model->reject(Yii::$app->request->post('rejection_reason'))) {
+                Yii::$app->session->setFlash('success', 'Artikel berhasil ditolak.');
+                return $this->redirect(['index']);
+            }
+        }
+
+        return $this->render('reject', ['model' => $model]);
+    }
+
+    protected function isAdmin()
+    {
+        return Yii::$app->user->can('Admin');
+    }
+
+    protected function checkPostAccess(Post $model)
+    {
+        if (!$this->isAdmin() && $model->username !== Yii::$app->user->identity->username) {
+            throw new ForbiddenHttpException('Anda tidak memiliki akses ke artikel ini.');
+        }
     }
 
     /**

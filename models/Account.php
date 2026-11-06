@@ -16,6 +16,9 @@ use Yii;
  */
 class Account extends \yii\db\ActiveRecord
 {
+    const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
+
     /**
      * @inheritdoc
      */
@@ -30,7 +33,8 @@ class Account extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['username', 'password', 'name', 'role'], 'required'],
+            [['username', 'name', 'role'], 'required'],
+            [['password'], 'required', 'on' => self::SCENARIO_CREATE],
             [['password'], 'string', 'max' => 250],
             [['username','name'], 'string', 'max' => 45],
             [['role'], 'string', 'max' => 8],

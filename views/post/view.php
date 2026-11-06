@@ -15,15 +15,22 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->idpost], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->idpost], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
+        <?php if (!Yii::$app->user->can('Admin') && in_array($model->status, [\app\models\Post::STATUS_DRAFT, \app\models\Post::STATUS_REJECTED], true)): ?>
+            <?= Html::a('Edit', ['update', 'id' => $model->idpost], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Ajukan review', ['submit', 'id' => $model->idpost], [
+                'class' => 'btn btn-success',
+                'data' => ['method' => 'post', 'confirm' => 'Ajukan artikel ini untuk review?'],
+            ]) ?>
+        <?php endif; ?>
     </p>
+
+    <p><strong>Status:</strong> <?= Html::encode($model->getStatusLabel()) ?></p>
+    <?php if ($model->status === \app\models\Post::STATUS_REJECTED): ?>
+        <div class="alert alert-warning">
+            <strong>Alasan penolakan:</strong><br>
+            <?= nl2br(Html::encode($model->rejection_reason)) ?>
+        </div>
+    <?php endif; ?>
 
     <?= DetailView::widget([
         'model' => $model,
@@ -32,6 +39,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'content:html',
             'date',
             'username',
+            [
+                'attribute' => 'status',
+                'value' => $model->getStatusLabel(),
+            ],
         ],
     ]) ?>
 

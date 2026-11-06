@@ -39,8 +39,12 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Post', 'url' => ['/post/index']],
-            ['label' => 'Akun', 'url' => ['/account/index']],
+            ['label' => 'Artikel Saya', 'url' => ['/post/index']],
+            [
+                'label' => 'Akun',
+                'url' => ['/account/index'],
+                'visible' => Yii::$app->user->can('Admin'),
+            ],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
