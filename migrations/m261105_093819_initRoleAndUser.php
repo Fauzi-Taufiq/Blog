@@ -21,11 +21,11 @@ class m261105_093819_initRoleAndUser extends Migration
         $auth = Yii::$app->authManager;
 
         // Buat permission
-        $permBlogIndex = $auth->createPermission('/blog/index');
+        $permBlogIndex = $auth->createPermission('post/index');
         $permBlogIndex->description = 'Akses halaman index blog';
         $auth->add($permBlogIndex);
 
-        $permBlogDelete = $auth->createPermission('/blog/delete');
+        $permBlogDelete = $auth->createPermission('post/delete');
         $permBlogDelete->description = 'Hapus blog';
         $auth->add($permBlogDelete);
 
@@ -62,12 +62,12 @@ class m261105_093819_initRoleAndUser extends Migration
             $auth->remove($roleAuthor);
         }
 
-        $permBlogIndex = $auth->getPermission('/blog/index');
+        $permBlogIndex = $auth->getPermission('post/index');
         if ($permBlogIndex) {
             $auth->remove($permBlogIndex);
         }
 
-        $permBlogDelete = $auth->getPermission('/blog/delete');
+        $permBlogDelete = $auth->getPermission('post/delete');
         if ($permBlogDelete) {
             $auth->remove($permBlogDelete);
         }
